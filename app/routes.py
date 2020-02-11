@@ -24,6 +24,10 @@ def index():
         {
             'author': {'username': 'Ипполит'},
             'body': 'Какая гадость эта ваша заливная рыба!!'
+        },
+        {
+            'author': {'username': 'Ипполин'},
+            'body': 'Мы с вами еще встретимся 20 лет спустя'
         }
     ]
     return render_template('index.html', title='Мой домашний', posts=posts)
@@ -67,3 +71,13 @@ def register():
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+@app.route('/user/<username>')
+@login_required
+def user(username):
+    user = User.query.filter_by(username=username).first_or_404()
+    posts = [
+        {'author': user, 'body': 'Test post # 1'},
+        {'author': user, 'body': 'Test post # 2'}
+    ]
+    return render_template('user.html', user=user, posts=posts)
