@@ -1,4 +1,4 @@
-{% extends base.html%}
+{% extends "base.html" %}
 
 {% block content%}
     <h2>Edit profile</h2>
@@ -13,11 +13,11 @@
         </p>
         <p>
             {{form.about_me.label}}<br>
-            {{form.about_me(cols=50, rows 4)}}<br>
+            {{form.about_me(cols=50, rows=4)}}<br>
             {% for error in errors%}
             <span style="color: red">[{{error}}]</span>
             {% endfor %}
         </p>
         <p>{{form.submit()}}</p>
     </form>
-{% end block%}
+{% endblock%}
