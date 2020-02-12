@@ -39,6 +39,7 @@ def index():
             'body': 'Мы с вами еще встретимся 20 лет спустя'
         }
     ]
+    app.logger.info('GET /index')
     return render_template('index.html', title='Мой домашний', posts=posts)
 
 
