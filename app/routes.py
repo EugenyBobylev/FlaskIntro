@@ -1,3 +1,4 @@
+from datetime import datetime
 from flask import render_template
 from app import app, db
 from app.forms import LoginForm
@@ -6,6 +7,13 @@ from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User
 from werkzeug.urls import url_parse
 from app.forms import RegistrationForm
+
+
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        db.session.commit()
 
 
 @app.route('/')
@@ -71,6 +79,7 @@ def register():
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
 
 @app.route('/user/<username>')
 @login_required
