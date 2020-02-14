@@ -51,6 +51,26 @@ class User(UserMixin, db.Model):
         url = f'https://www.gravatar.com/avatar/{digest}?d=identicon&s={size}'
         return url
 
+    def is_following(self, user):
+        return self.followed.filter(followers.c.followed_id == user.id).count() > 0
+
+    def follow(self, user):
+        if not self.is_following(user):
+            self.followed.append(user)
+
+    def unfollow(self, user):
+        if self.is_following(user):
+            self.followed.remove(user)
+
+    def followed_posts(self):
+        followed = Post.query.join(followers,
+            (followers.c.followed_id == Post.user_id))\
+            .filter(followers.c.follower_id == self.id)\
+            .order_by(Post.timestamp.desc()
+        )
+        own = Post.query.filter_by(user_id=self.id)
+        return followed.union(own).order_by(Post.timestamp.desc())
+
 
 class Post(db.Model):
     __tablename__ = "post"
