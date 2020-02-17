@@ -42,6 +42,19 @@ class UserModelCase(unittest.TestCase):
         self.assertEqual(u1.followed.count(), 0)
         self.assertEqual(u2.followers.count(), 0)
 
+    def test_posts(self):
+        u1 = User(username='john', email='john@example.com')
+        u2 = User(username='susan', email='susan@example.com')
+        db.session.add_all([u1, u2])
+
+        now = datetime.utcnow()
+        p1 = Post(body='post  from john', author=u1, timestamp=now)
+        p2 = Post(body='post from susan', author=u1, timestamp=now + timedelta(minutes=2))
+        db.session.add_all([p1, p2])
+        db.session.commit()
+
+        self.assertEqual(2, len(u1.posts))
+
     def test_follow_posts(self):
         # create four users
         u1 = User(username='john', email='john@example.com')
@@ -50,35 +63,14 @@ class UserModelCase(unittest.TestCase):
         u4 = User(username='david', email='david@example.com')
         db.session.add_all([u1, u2, u3, u4])
 
-        # create four posts
         now = datetime.utcnow()
-        p1 = Post(body="post from john", author=u1,
-                  timestamp=now + timedelta(seconds=1))
-        p2 = Post(body="post from susan", author=u2,
-                  timestamp=now + timedelta(seconds=4))
-        p3 = Post(body="post from mary", author=u3,
-                  timestamp=now + timedelta(seconds=3))
-        p4 = Post(body="post from david", author=u4,
-                  timestamp=now + timedelta(seconds=2))
-        db.session.add_all([p1, p2, p3, p4])
+        p1 = Post(body='post from john', author=u1, timestamp=now)
+        p2 = Post(body='post from susan', author=u2, timestamp=now+ timedelta(minutes=2))
+        p3 = Post(body='post from susan', author=u2, timestamp=now+ timedelta(minutes=4))
+        p4 = Post(body='post from susan', author=u3, timestamp=now+ timedelta(minutes=1))
         db.session.commit()
 
-        # setup the followers
-        u1.follow(u2)  # john follows susan
-        u1.follow(u4)  # john follows david
-        u2.follow(u3)  # susan follows mary
-        u3.follow(u4)  # mary follows david
-        db.session.commit()
-
-        # check the followed posts of each user
-        f1 = u1.followed_posts().all()
-        f2 = u2.followed_posts().all()
-        f3 = u3.followed_posts().all()
-        f4 = u4.followed_posts().all()
-        self.assertEqual(f1, [p2, p4, p1])
-        self.assertEqual(f2, [p2, p3])
-        self.assertEqual(f3, [p3, p4])
-        self.assertEqual(f4, [p4])
+        u3.followed(u1)
 
 
 if __name__ == '__main__':

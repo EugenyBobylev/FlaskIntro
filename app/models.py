@@ -27,7 +27,7 @@ class User(UserMixin, db.Model):
     about_me = db.Column(db.String(140))
     last_seen = db.Column(db.DateTime, default=datetime.utcnow)
 
-    posts = db.relationship('Post', backref='author', lazy='dynamic')
+    posts = db.relationship('Post', back_populates='author')
     followed = db.relationship(
         'User', secondary=followers,
         primaryjoin=(followers.c.follower_id == id),
@@ -79,6 +79,7 @@ class Post(db.Model):
     body = db.Column(db.String(140))
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    author = db.relationship("User", back_populates='posts' )
 
     def __repr__(self):
         return '<Post {}>'.format(self.body)
