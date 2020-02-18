@@ -74,11 +74,14 @@ class UserModelCase(unittest.TestCase):
         # setup the followers
         u3.follow(u1) # Mary follows John
         u3.follow(u2) # Mary follows Susan
+        u1.follow(u3) # John follows Marry
 
         # check the followed posts
-        f1 = u3.followed_posts().all();
+        f1 = u3.followed_posts().all()
+        f2 = u1.followed_posts().all()
 
         self.assertEqual([p3,p2, p4, p1], f1)
+        self.assertEqual([p4, p1], f2)
 
 
 if __name__ == '__main__':
