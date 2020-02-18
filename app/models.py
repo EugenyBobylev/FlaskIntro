@@ -63,13 +63,11 @@ class User(UserMixin, db.Model):
             self.followed.remove(user)
 
     def followed_posts(self):
-        followed = Post.query.join(followers,
-            (followers.c.followed_id == Post.user_id))\
-            .filter(followers.c.follower_id == self.id)\
-            .order_by(Post.timestamp.desc()
-        )
-        own = Post.query.filter_by(user_id=self.id)
-        return followed.union(own).order_by(Post.timestamp.desc())
+        followed1 = self.followed.all()
+        ids = [f.id for f in followed1]
+        ids.append(self.id)
+        query = Post.query.filter(Post.user_id.in_(ids)).order_by(Post.timestamp.desc())
+        return query
 
 
 class Post(db.Model):

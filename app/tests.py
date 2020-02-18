@@ -63,14 +63,22 @@ class UserModelCase(unittest.TestCase):
         u4 = User(username='david', email='david@example.com')
         db.session.add_all([u1, u2, u3, u4])
 
+        # Create posts
         now = datetime.utcnow()
         p1 = Post(body='post from john', author=u1, timestamp=now)
-        p2 = Post(body='post from susan', author=u2, timestamp=now+ timedelta(minutes=2))
-        p3 = Post(body='post from susan', author=u2, timestamp=now+ timedelta(minutes=4))
-        p4 = Post(body='post from susan', author=u3, timestamp=now+ timedelta(minutes=1))
+        p2 = Post(body='post from susan', author=u2, timestamp=now + timedelta(minutes=2))
+        p3 = Post(body='post from susan', author=u2, timestamp=now + timedelta(minutes=4))
+        p4 = Post(body='post from mary', author=u3, timestamp=now + timedelta(minutes=1))
         db.session.commit()
 
-        u3.followed(u1)
+        # setup the followers
+        u3.follow(u1) # Mary follows John
+        u3.follow(u2) # Mary follows Susan
+
+        # check the followed posts
+        f1 = u3.followed_posts().all();
+
+        self.assertEqual([p3,p2, p4, p1], f1)
 
 
 if __name__ == '__main__':
