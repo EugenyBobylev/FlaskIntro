@@ -1,10 +1,10 @@
 from datetime import datetime
 from flask import render_template
 from app import app, db
-from app.forms import LoginForm
+from app.forms import LoginForm, PostForm
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user, login_required
-from app.models import User
+from app.models import User, Post
 from werkzeug.urls import url_parse
 from app.forms import RegistrationForm
 from app.forms import EditProfileForm
@@ -17,30 +17,20 @@ def before_request():
         db.session.commit()
 
 
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():
-    posts = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'username': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        },
-        {
-            'author': {'username': 'Ипполит'},
-            'body': 'Какая гадость эта ваша заливная рыба!!'
-        },
-        {
-            'author': {'username': 'Ипполин'},
-            'body': 'Мы с вами еще встретимся 20 лет спустя'
-        }
-    ]
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(body=form.post.data, author=current_user)
+        db.session.add(post)
+        db.session.commit()
+        flash('Ваше сообщение опубликовано')
+        return redirect(url_for('index'))
+    posts = current_user.followed_posts().all()
     app.logger.info('GET /index')
-    return render_template('index.html', title='Мой домашний', posts=posts)
+    return render_template('index.html', title='Мой домашний', form=form, posts=posts)
 
 
 @app.route('/login', methods=['GET', 'POST'])
