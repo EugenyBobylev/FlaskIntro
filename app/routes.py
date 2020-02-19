@@ -1,5 +1,7 @@
 from datetime import datetime
 from flask import render_template
+from flask_sqlalchemy import Pagination
+
 from app import app, db
 from app.forms import LoginForm, PostForm
 from flask import render_template, flash, redirect, url_for, request
@@ -28,9 +30,19 @@ def index():
         db.session.commit()
         flash('Ваше сообщение опубликовано')
         return redirect(url_for('index'))
-    posts = current_user.followed_posts().all()
+    # get page of followed posts
+    page = request.args.get('page', 1, type=int)
+    per_page = app.config['POSTS_PER_PAGE']
+    page_posts: Pagination = current_user.followed_posts().paginate(page, per_page, error_out=False)
+    posts = page_posts.items
+    next_url = url_for('index', page=page_posts.next_num) if page_posts.has_next else None
+    prev_url = url_for('index', page=page_posts.prev_num) if page_posts.has_prev else None
+    # loging
+    app.logger.info(f'next_url={next_url}')
+    app.logger.info(f'prev_url={prev_url}')
     app.logger.info('GET /index')
-    return render_template('index.html', title='Мой домашний', form=form, posts=posts)
+    return render_template('index.html', title='Мой домашний', form=form,
+                           posts=posts, next_url=next_url, prev_url=prev_url)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -77,10 +89,7 @@ def register():
 @login_required
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    posts = [
-        {'author': user, 'body': 'Test post # 1'},
-        {'author': user, 'body': 'Test post # 2'}
-    ]
+    posts = Post.query.filter(Post.user_id == user.id).order_by(Post.timestamp.desc()).all()
     return render_template('user.html', user=user, posts=posts)
 
 
@@ -135,5 +144,12 @@ def unfollow(username):
 @app.route('/explore')
 @login_required
 def explore():
-    posts = Post.query.order_by(Post.timestamp.desc()).all()
-    return  render_template('index.html', title="Explore", posts=posts)
+    # get page of followed posts
+    page = request.args.get('page', 1, type=int)
+    per_page = app.config['POSTS_PER_PAGE']
+    page_posts: Pagination = Post.query.order_by(Post.timestamp.desc()).paginate(page, per_page, error_out=False)
+    posts = page_posts.items
+    next_url = url_for('explore', page=page_posts.next_num) if page_posts.has_next else None
+    prev_url = url_for('explore', page=page_posts.prev_num) if page_posts.has_prev else None
+
+    return render_template('index.html', title="Explore", posts=posts, prev_url=prev_url, next_url=next_url)
