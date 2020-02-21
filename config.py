@@ -10,9 +10,10 @@ class Config(object):
     # configuring admin e-mail
     MAIL_SERVER = os.environ.get('MAIL_SERVER') or 'smtp.mail.ru'
     MAIL_PORT = int(os.environ.get('MAIL_PORT') or 465)
+    MAIL_USE_SSL = True
     MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or 'masternz@mail.ru'
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'Ujvbhrf1557'
-    ADMINS = ['bobylev.e.a@gmail.com']
+    ADMINS = ['masternz@mail.ru']
     # pagination
     POSTS_PER_PAGE = 3
