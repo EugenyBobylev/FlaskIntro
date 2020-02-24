@@ -12,8 +12,15 @@
             {% endfor %}
         </p>
         <p>
+            {{form.email.label}}<br>
+            {{form.email(size=60)}}
+            {% for error in errors%}
+            <span style="color: red">[{{error}}]</span>
+            {% endfor %}
+        </p>
+        <p>
             {{form.about_me.label}}<br>
-            {{form.about_me(cols=50, rows=4)}}<br>
+            {{form.about_me(cols=60, rows=4)}}<br>
             {% for error in errors%}
             <span style="color: red">[{{error}}]</span>
             {% endfor %}

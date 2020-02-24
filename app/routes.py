@@ -108,15 +108,17 @@ def user(username):
 @app.route('/edit_profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
-    form = EditProfileForm(current_user.username)
+    form = EditProfileForm(current_user.username, current_user.email)
     if form.validate_on_submit():
         current_user.username = form.username.data
+        current_user.email = form.email.data
         current_user.about_me = form.about_me.data
         db.session.commit()
         flash('Your changes have been saved')
         return redirect(url_for('index'))
     elif request.method == 'GET':
         form.username.data = current_user.username
+        form.email = current_user.email
         form.about_me.data = current_user.about_me
     return render_template('edit_profile.html', title='Edit Profile', form=form)
 
@@ -180,7 +182,10 @@ def reset_password_request():
         if user:
             send_password_reset_email(user)
         flash('Check your email for the instructions to reset your password')
+        app.logger.info(f'PUT /reset_password_request {user}')
         return redirect(url_for('login'))
+
+    app.logger.info('GET /reset_password_request')
     return render_template('reset_password_request.html', title='Reset Password', form=form)
 
 
@@ -196,5 +201,8 @@ def reset_password(token):
         user.set_password(form.password.data)
         db.session.commit()
         flash('Your password has been reset.')
+        app.logger.info(f'PUT /reset_password_request {token}')
         return redirect(url_for('login'))
+
+    app.logger.info('GET /reset_password_request')
     return render_template('reset_password.html', form=form)
