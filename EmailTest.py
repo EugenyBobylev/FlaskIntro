@@ -31,8 +31,8 @@ html = """
 """
 msg.attach(MIMEText(html, 'html', 'utf-8'))
 
-socks.set_default_proxy(socks.HTTP, '192.168.33.212', 8080)
-socks.wrapmodule(smtplib)
+# socks.set_default_proxy(socks.HTTP, '192.168.33.212', 8080)
+# socks.wrapmodule(smtplib)
 server = None
 try:
     server = smtplib.SMTP_SSL(host=smtp_mail_ru, port=port_mail_ru)

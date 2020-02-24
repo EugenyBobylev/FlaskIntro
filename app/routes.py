@@ -110,6 +110,7 @@ def user(username):
 def edit_profile():
     form = EditProfileForm(current_user.username)
     if form.validate_on_submit():
+        current_user.email = form.email.data
         current_user.username = form.username.data
         current_user.about_me = form.about_me.data
         db.session.commit()
@@ -118,6 +119,7 @@ def edit_profile():
     elif request.method == 'GET':
         form.username.data = current_user.username
         form.about_me.data = current_user.about_me
+        form.email.data = current_user.email
     return render_template('edit_profile.html', title='Edit Profile', form=form)
 
 
