@@ -16,4 +16,6 @@ class Config(object):
     MAIL_PASSWORD = 'ujvbhrf1557'
     ADMINS = ['dotnetcoder@mail.ru']
     # pagination
-    POSTS_PER_PAGE = 3
+    POSTS_PER_PAGE = 5
+    # localization
+    LANGUAGES = ['en', 'es', 'ru']
