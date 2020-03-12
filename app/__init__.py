@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_babel import Babel
 from flask_bootstrap import Bootstrap
 from flask_moment import Moment
 
@@ -19,6 +20,7 @@ migrate = Migrate(app, db)
 mail = Mail(app)
 bootstrap = Bootstrap(app)
 moment = Moment(app)
+babel = Babel(app)
 
 login = LoginManager(app)
 login.login_view = 'login'
