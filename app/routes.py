@@ -1,18 +1,20 @@
 from datetime import datetime
 from flask import render_template
+from flask import render_template, flash, redirect, url_for, request
+from flask_login import current_user, login_user, logout_user, login_required
 from flask_sqlalchemy import Pagination
+
+from werkzeug.urls import url_parse
 
 from app import app, db
 from app.forms import LoginForm, PostForm
-from flask import render_template, flash, redirect, url_for, request
-from flask_login import current_user, login_user, logout_user, login_required
 from app.models import User, Post
-from werkzeug.urls import url_parse
 from app.forms import RegistrationForm
 from app.forms import EditProfileForm
 from app.forms import ResetPasswordRequestForm
 from app.email import send_password_reset_email
 from app.forms import ResetPasswordForm
+
 
 @app.before_request
 def before_request():
